@@ -2,14 +2,26 @@
 #include "GL/glew.h"
 #include <GLFW/glfw3.h>
 
+// #include "imgui/imgui.h"
+// #include "imgui/imgui_impl_glfw.h"
+// #include "imgui/imgui_impl_opengl3.h"
+
+#include "imgui/imgui.cpp"
+#include "imgui/imgui_draw.cpp"
+#include "imgui/imgui_impl_glfw.cpp"
+#include "imgui/imgui_impl_opengl3.cpp"
+#include "imgui/imgui_widgets.cpp"
+#include "imgui/imgui_demo.cpp"
+
 // GLM Mathematics
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+
 #include <iostream>
 
-const int SCREEN_WIDTH = 800, SCREEN_HEIGHT = 600;
+const int SCREEN_WIDTH = 1080, SCREEN_HEIGHT = 720;
 bool keys[1024];
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -205,9 +217,35 @@ int main(int argc, char *argv[])
     
     GLuint shaderProgram = create_shader("vertexshader.vs", "fragmentshader.frag");
     GLuint cube = createCube();
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    // ImGui::StyleColorsClassic();
+    // Setup Platform/Renderer bindings
+    const char* glsl_version = "#version 150";
+    ImGui_ImplGlfw_InitForOpenGL(win, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
     
     while(!glfwWindowShouldClose(win)) {
         glfwPollEvents();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+	
+	bool show_demo_window = true;
+	ImGui::ShowDemoWindow(&show_demo_window);
+	
+
+	
+
         glClearColor(0.2f, 0.6f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
         
@@ -230,6 +268,9 @@ int main(int argc, char *argv[])
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
+        ImGui::Render();
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(win);
     }
 
